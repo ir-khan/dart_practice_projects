@@ -1,0 +1,3 @@
+class UserLogout {
+    const UserLogout ();
+}

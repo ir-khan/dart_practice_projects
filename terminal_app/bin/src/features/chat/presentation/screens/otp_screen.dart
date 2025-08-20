@@ -1,0 +1,3 @@
+class OtpScreen {
+    const OtpScreen ();
+}

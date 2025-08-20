@@ -1,0 +1,3 @@
+class CustomPinputField {
+    const CustomPinputField ();
+}

@@ -1,0 +1,3 @@
+class AuthEvent {
+    const AuthEvent ();
+}

@@ -1,0 +1,3 @@
+class UserSignup {
+    const UserSignup ();
+}

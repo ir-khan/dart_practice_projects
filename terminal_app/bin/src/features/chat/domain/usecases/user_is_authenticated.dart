@@ -1,0 +1,3 @@
+class UserIsAuthenticated {
+    const UserIsAuthenticated ();
+}

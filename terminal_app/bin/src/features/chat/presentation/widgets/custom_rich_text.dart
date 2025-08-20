@@ -1,0 +1,3 @@
+class CustomRichText {
+    const CustomRichText ();
+}
