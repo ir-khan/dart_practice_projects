@@ -4,20 +4,48 @@ part 'product.freezed.dart';
 part 'product.g.dart';
 
 @freezed
-abstract class Product with _$Product {
-  const factory Product({
-    @JsonKey(name: 'product_id') required int productId,
-    required String name,
-    required String description,
-    required double price,
-    required String unit,
-    required String image,
-    required int discount,
-    required bool availability,
-    required String brand,
-    required String category,
-    required double rating,
-  }) = _Product;
+@JsonSerializable()
+class Product with _$Product {
+  @override
+  @JsonKey(name: 'product_id')
+  final int productId;
+  @override
+  final String name;
+  @override
+  final String description;
+  @override
+  final double price;
+  @override
+  final String unit;
+  @override
+  final String image;
+  @override
+  final int discount;
+  @override
+  final bool availability;
+  @override
+  final String brand;
+  @override
+  final String category;
+  @override
+  final double rating;
 
-  factory Product.fromJson(Map<String, Object?> json) => _$ProductFromJson(json);
+  Product({
+    required this.productId,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.unit,
+    required this.image,
+    required this.discount,
+    required this.availability,
+    required this.brand,
+    required this.category,
+    required this.rating,
+  });
+
+  factory Product.fromJson(Map<String, Object?> json) =>
+      _$ProductFromJson(json);
+
+  Map<String, Object?> toJson() => _$ProductToJson(this);
 }
