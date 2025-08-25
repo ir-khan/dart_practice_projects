@@ -1,0 +1,16 @@
+{
+  "name": "fake_user_server",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Izn Ur Rehman Khan",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:server": "node server.js"
+  },
+  "devDependencies": {
+    "json-server": "^0.17.4"
+  }
+}

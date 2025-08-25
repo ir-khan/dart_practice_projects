@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "firstName": "John",
+      "lastName": "Smith",
+      "birthYear": 1995,
+      "country": "USA"
+    },
+    {
+      "id": 2,
+      "firstName": "Emma",
+      "lastName": "Johnson",
+      "birthYear": 1998,
+      "country": "Canada"
+    },
+    {
+      "id": 4,
+      "firstName": "Sofia",
+      "lastName": "Rossi",
+      "birthYear": 1996,
+      "country": "Italy"
+    },
+    {
+      "id": 5,
+      "firstName": "Hiroshi",
+      "lastName": "Tanaka",
+      "birthYear": 1989,
+      "country": "Japan"
+    },
+    {
+      "id": 6,
+      "firstName": "Maria",
+      "lastName": "Garcia",
+      "birthYear": 1993,
+      "country": "Spain"
+    },
+    {
+      "id": 7,
+      "firstName": "David",
+      "lastName": "Müller",
+      "birthYear": 1990,
+      "country": "Germany"
+    },
+    {
+      "id": 8,
+      "firstName": "Amina",
+      "lastName": "Ahmed",
+      "birthYear": 1997,
+      "country": "Egypt"
+    },
+    {
+      "id": 9,
+      "firstName": "Lucas",
+      "lastName": "Dubois",
+      "birthYear": 1994,
+      "country": "France"
+    },
+    {
+      "id": 10,
+      "firstName": "Isabella",
+      "lastName": "Silva",
+      "birthYear": 1991,
+      "country": "Brazil"
+    },
+    {
+      "firstName": "Saad",
+      "lastName": "Hasim",
+      "birthYear": 1994,
+      "country": "Pakistan",
+      "id": 11
+    }
+  ]
+}
