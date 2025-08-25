@@ -1,9 +1,6 @@
 import 'dart:io';
 
-import 'package:chopper/chopper.dart';
-import 'package:user_terminal_app/apis/user_api_service.dart';
 import 'package:user_terminal_app/exceptions/exceptions.dart';
-import 'package:user_terminal_app/local/user_file_service.dart';
 import 'package:user_terminal_app/repositories/user_file_repository.dart';
 import 'package:user_terminal_app/repositories/user_repository.dart';
 import 'package:user_terminal_app/repositories/user_server_repository.dart';
@@ -19,15 +16,17 @@ const validUserArguments = <String>[
 final validUserInformationFormat = RegExp(
   r"^[a-zA-Z]+,[a-zA-Z]+,[0-9]{4},[a-zA-Z]+$",
 );
-final chopper = ChopperClient(
-  baseUrl: Uri.parse("http://localhost:3000"),
-  services: [UserApiService.create()],
-  converter: JsonConverter(),
-  interceptors: [HttpLoggingInterceptor()],
-);
+const validEncodingArguments = <String>['line', 'json'];
+// final chopper = ChopperClient(
+//   baseUrl: Uri.parse("http://localhost:3000"),
+//   services: [UserApiService.create()],
+//   converter: JsonConverter(),
+//   interceptors: [HttpLoggingInterceptor()],
+// );
 
 void main(List<String> arguments) async {
   late UserRepository userRepository;
+  late String encoding;
   try {
     if (arguments.isEmpty) {
       throw NoArgumentException('Please provide an arguments.');
@@ -35,15 +34,29 @@ void main(List<String> arguments) async {
       throw TooLowArgumentsException(
         'Please specify second argument to perform user\'s operations.',
       );
-    } else if (arguments.length > 4) {
+    } else if (arguments.length > 6) {
       throw TooManyArgumentsException('You specified too many arguments.');
     }
 
+    final encodingFlagIndex = arguments.indexWhere((arg) => arg == '-e');
+    if (encodingFlagIndex != -1) {
+      if (arguments.length < encodingFlagIndex + 2 ||
+          !validEncodingArguments.contains(arguments[encodingFlagIndex + 1])) {
+        throw InvalidArgumentException(
+          'Valid encoding arguments are: ${validEncodingArguments.join(', ')}. Used as -e line. ',
+        );
+      } else {
+        encoding = arguments[encodingFlagIndex + 1];
+      }
+    } else {
+      encoding = 'line';
+    }
+
     if (arguments.first == '-f') {
-      userRepository = UserFileRepository(UserFileService());
+      userRepository = UserFileRepository(await UserFileService.init(), storage: StorageType.fromString(encoding));
     } else if (arguments.first == '-s') {
       userRepository = UserServerRepository(
-        chopper.getService<UserApiService>(),
+        // chopper.getService<UserApiService>(),
       );
     } else {
       throw InvalidArgumentException('The first argument should be -f or -s');
@@ -51,7 +64,7 @@ void main(List<String> arguments) async {
 
     if (!validUserArguments.contains(arguments[1])) {
       throw InvalidArgumentException(
-        'Valid second arrguments are: ${validUserArguments.join(', ')}',
+        'Valid second arguments are: ${validUserArguments.join(', ')}',
       );
     }
 
