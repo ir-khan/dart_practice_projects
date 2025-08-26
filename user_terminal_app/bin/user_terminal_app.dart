@@ -1,22 +1,15 @@
 import 'dart:io';
 
-import 'package:user_terminal_app/exceptions/exceptions.dart';
-import 'package:user_terminal_app/repositories/user_file_repository.dart';
-import 'package:user_terminal_app/repositories/user_repository.dart';
-import 'package:user_terminal_app/repositories/user_server_repository.dart';
+import 'package:user_terminal_app/core/databases/local_database.dart';
+import 'package:user_terminal_app/core/enums/enums.dart';
+import 'package:user_terminal_app/core/exceptions/exceptions.dart';
+import 'package:user_terminal_app/core/utils/validators.dart';
+import 'package:user_terminal_app/user/repositories/user_database_repository.dart';
+import 'package:user_terminal_app/user/repositories/user_file_repository.dart';
+import 'package:user_terminal_app/user/repositories/user_repository.dart';
+import 'package:user_terminal_app/user/repositories/user_server_repository.dart';
+import 'package:user_terminal_app/user/services/user_file_service.dart';
 
-const validUserArguments = <String>[
-  '-u',
-  '--find',
-  '--list',
-  '--del',
-  '--del-all',
-  '--up',
-];
-final validUserInformationFormat = RegExp(
-  r"^[a-zA-Z]+,[a-zA-Z]+,[0-9]{4},[a-zA-Z]+$",
-);
-const validEncodingArguments = <String>['line', 'json'];
 // final chopper = ChopperClient(
 //   baseUrl: Uri.parse("http://localhost:3000"),
 //   services: [UserApiService.create()],
@@ -26,11 +19,49 @@ const validEncodingArguments = <String>['line', 'json'];
 
 void main(List<String> arguments) async {
   late UserRepository userRepository;
-  late String encoding;
+  late StorageType encoding;
+  late AppDatabase? database;
+
   try {
     if (arguments.isEmpty) {
       throw NoArgumentException('Please provide an arguments.');
-    } else if (arguments.length == 1) {
+    }
+
+    final encodingFlagIndex = arguments.indexWhere((arg) => arg == '-e');
+    if (encodingFlagIndex != -1) {
+      if (arguments.length < encodingFlagIndex + 2) {
+        throw InvalidArgumentException(
+          'Valid encoding arguments are: ${StorageType.values.join(', ')}. Used as -e line.',
+        );
+      }
+      encoding = StorageType.values.fromString(
+        arguments[encodingFlagIndex + 1],
+      );
+    } else {
+      encoding = StorageType.line;
+    }
+
+    final repoSource = RepositorySource.values.fromString(arguments.first);
+
+    switch (repoSource) {
+      case RepositorySource.file:
+        userRepository = UserFileRepository(
+          await UserFileService.init(),
+          storage: encoding,
+        );
+        break;
+      case RepositorySource.server:
+        userRepository = UserServerRepository(
+          // chopper.getService<UserApiService>(),
+        );
+        break;
+      case RepositorySource.database:
+        database = AppDatabase();
+        userRepository = UserDatabaseRepository(database);
+        break;
+    }
+
+    if (arguments.length == 1) {
       throw TooLowArgumentsException(
         'Please specify second argument to perform user\'s operations.',
       );
@@ -38,120 +69,77 @@ void main(List<String> arguments) async {
       throw TooManyArgumentsException('You specified too many arguments.');
     }
 
-    final encodingFlagIndex = arguments.indexWhere((arg) => arg == '-e');
-    if (encodingFlagIndex != -1) {
-      if (arguments.length < encodingFlagIndex + 2 ||
-          !validEncodingArguments.contains(arguments[encodingFlagIndex + 1])) {
-        throw InvalidArgumentException(
-          'Valid encoding arguments are: ${validEncodingArguments.join(', ')}. Used as -e line. ',
-        );
-      } else {
-        encoding = arguments[encodingFlagIndex + 1];
-      }
-    } else {
-      encoding = 'line';
-    }
+    final arg = ValidUserArguments.values.fromString(arguments[1]);
 
-    if (arguments.first == '-f') {
-      userRepository = UserFileRepository(await UserFileService.init(), storage: StorageType.fromString(encoding));
-    } else if (arguments.first == '-s') {
-      userRepository = UserServerRepository(
-        // chopper.getService<UserApiService>(),
-      );
-    } else {
-      throw InvalidArgumentException('The first argument should be -f or -s');
-    }
-
-    if (!validUserArguments.contains(arguments[1])) {
-      throw InvalidArgumentException(
-        'Valid second arguments are: ${validUserArguments.join(', ')}',
-      );
-    }
-
-    if ((arguments[1] == validUserArguments[0] ||
-            arguments[1] == validUserArguments[1] ||
-            arguments[1] == validUserArguments[3] ||
-            arguments[1] == validUserArguments[5]) &&
-        arguments.length == 2) {
-      throw TooLowArgumentsException(
-        'Please provide appropriate user information after ${arguments[1]}.',
-      );
-    }
-
-    if (arguments[1] == validUserArguments[0]) {
-      if (isValidUserInformation(arguments[2])) {
-        final user = arguments[2].split(',');
-
-        await userRepository.createUser(
-          firstName: user[0],
-          lastName: user[1],
-          birthYear: int.parse(user[2]),
-          country: user[3],
-        );
-        print("User created successfully!");
-        return;
-      }
-    } else if (arguments[1] == validUserArguments[1]) {
-      print(await userRepository.getUsertById(id: validInt(arguments[2])));
-    } else if (arguments[1] == validUserArguments[2] && arguments.length == 2) {
-      userRepository.getAllUser().then((users) {
+    switch (arg) {
+      case ValidUserArguments.u:
+        if (arguments.length < 3) {
+          throw TooLowArgumentsException(
+            'Please provide user information after -u.',
+          );
+        }
+        if (isValidUserInformation(arguments[2])) {
+          final user = arguments[2].split(',');
+          await userRepository.createUser(
+            firstName: user[0],
+            lastName: user[1],
+            birthYear: int.parse(user[2]),
+            country: user[3],
+          );
+          print("User created successfully!");
+        }
+        break;
+      case ValidUserArguments.find:
+        if (arguments.length < 3) {
+          throw TooLowArgumentsException('Please provide a user ID to find.');
+        }
+        print(await userRepository.getUsertById(id: validInt(arguments[2])));
+        break;
+      case ValidUserArguments.list:
+        final users = await userRepository.getAllUser();
         if (users.isEmpty) {
           print('No user found');
-          return;
         }
         users.forEach(print);
-      });
-      return;
-    } else if (arguments[1] == validUserArguments[3]) {
-      await userRepository.deleteUser(id: validInt(arguments[2]));
-      print("User with id ${arguments[2]} deleted successfully!");
-      return;
-    } else if (arguments[1] == validUserArguments[4] && arguments.length == 2) {
-      await userRepository.deleteAllUser();
-      print("All users deleted successfully!");
-      return;
-    } else if (arguments[1] == validUserArguments[5]) {
-      if (arguments.length < 4) {
-        throw TooLowArgumentsException('You specified too low arguments.');
-      }
-      if (isValidUserInformation(arguments[3])) {
-        final user = arguments[3].split(',');
-
-        if (await userRepository.updateUser(
-          id: validInt(arguments[2]),
-          firstName: user[0],
-          lastName: user[1],
-          birthYear: int.parse(user[2]),
-          country: user[3],
-        )) {
-          print('User update succesfully!');
+        break;
+      case ValidUserArguments.del:
+        if (arguments.length < 3) {
+          throw TooLowArgumentsException('Please provide a user ID to delete.');
         }
-        return;
-      }
-    } else {
-      if (arguments.length != 2) {
-        throw TooManyArgumentsException('You specified too many arguments.');
-      }
+        await userRepository.deleteUser(id: validInt(arguments[2]));
+        print("User with id ${arguments[2]} deleted successfully!");
+        break;
+      case ValidUserArguments.delAll:
+        await userRepository.deleteAllUser();
+        print("All users deleted successfully!");
+        break;
+      case ValidUserArguments.up:
+        if (arguments.length < 4) {
+          throw TooLowArgumentsException(
+            'Please provide user ID and updated information.',
+          );
+        }
+        if (isValidUserInformation(arguments[3])) {
+          final user = arguments[3].split(',');
+          final updated = await userRepository.updateUser(
+            id: validInt(arguments[2]),
+            firstName: user[0],
+            lastName: user[1],
+            birthYear: int.parse(user[2]),
+            country: user[3],
+          );
+          if (updated) {
+            print('User updated successfully!');
+          }
+        }
+        break;
     }
   } on AppException catch (e) {
     print(e.toString());
     exit(-1);
+  } finally {
+    if (database != null) {
+      await database.close();
+    }
   }
-}
-
-int validInt(String string) {
-  try {
-    return int.parse(string);
-  } on FormatException {
-    throw InvalidArgumentException(
-      'Provide a valid integer to process certain user.',
-    );
-  }
-}
-
-bool isValidUserInformation(String source) {
-  if (validUserInformationFormat.hasMatch(source)) return true;
-  throw InvalidUserInformationException(
-    'The user information should be in the following format "firstname,lastname,birthyear,country"',
-  );
 }
