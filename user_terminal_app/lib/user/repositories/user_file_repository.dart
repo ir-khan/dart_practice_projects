@@ -40,7 +40,7 @@ class UserFileRepository implements UserRepository {
 
   @override
   Future<User> getUsertById({required int id}) async {
-    return await _userFileService.getUsertById(id: id, storage: _storage);
+    return await _userFileService.getUserById(id: id, storage: _storage);
   }
 
   @override

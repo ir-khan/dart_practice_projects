@@ -35,7 +35,9 @@ enum ValidUserArguments with ParseableEnum {
 
 enum StorageType with ParseableEnum {
   line,
-  json;
+  json,
+  binary,
+  all;
 
   @override
   String get rawValue => name;
@@ -51,7 +53,8 @@ extension EnumParsing<E extends Enum> on Iterable<E> {
     return firstWhere(
       (e) {
         if (e is ParseableEnum) {
-          return (e as ParseableEnum).rawValue.toLowerCase() == input.toLowerCase();
+          return (e as ParseableEnum).rawValue.toLowerCase() ==
+              input.toLowerCase();
         }
         return e.name.toLowerCase() == input.toLowerCase();
       },

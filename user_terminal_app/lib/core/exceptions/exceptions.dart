@@ -40,3 +40,7 @@ class FileException extends AppException {
     super.message = 'Something went wrong while dealing with file.',
   ]);
 }
+
+class NotFoundException extends AppException {
+  const NotFoundException([super.message = 'Not Found']);
+}

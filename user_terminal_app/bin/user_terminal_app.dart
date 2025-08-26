@@ -20,7 +20,7 @@ import 'package:user_terminal_app/user/services/user_file_service.dart';
 void main(List<String> arguments) async {
   late UserRepository userRepository;
   late StorageType encoding;
-  late AppDatabase? database;
+  AppDatabase? database;
 
   try {
     if (arguments.isEmpty) {

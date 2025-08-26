@@ -5,7 +5,7 @@ import 'package:drift/native.dart';
 
 part 'local_database.g.dart';
 
-class Users extends Table {
+class UserTable extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get firstName => text()();
   TextColumn get lastName => text()();
@@ -13,7 +13,7 @@ class Users extends Table {
   TextColumn get country => text()();
 }
 
-@DriftDatabase(tables: [Users])
+@DriftDatabase(tables: [UserTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
