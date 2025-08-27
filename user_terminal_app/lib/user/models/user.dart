@@ -20,24 +20,29 @@ abstract class User with _$User {
 }
 
 extension UserRaw on User {
-  String toRawString() =>
-      '$id|$firstName|$lastName|$birthYear|$country${Platform.lineTerminator}';
+  String toMultilineString() =>
+      '$id${Platform.lineTerminator}$firstName${Platform.lineTerminator}$lastName${Platform.lineTerminator}$birthYear${Platform.lineTerminator}$country${Platform.lineTerminator}${Platform.lineTerminator}';
 
-  static String fromList(List<User> users) {
-    return users.map((user) => user.toRawString()).toList().join();
+  static String fromMultilineList(List<User> users) {
+    return users.map((user) => user.toMultilineString()).join();
   }
 
-  static User fromRawString(String raw) {
-    final parts = raw.split('|');
-    if (parts.length != 5) {
-      throw InvalidUserInformationException('Invalid raw user string: $raw');
+  static User fromMultilineString(String block) {
+    final lines = block
+        .split(Platform.lineTerminator)
+        .where((l) => l.isNotEmpty)
+        .toList();
+    if (lines.length != 5) {
+      throw InvalidUserInformationException(
+        'Invalid multiline user block: $block',
+      );
     }
     return User(
-      id: int.parse(parts[0]),
-      firstName: parts[1],
-      lastName: parts[2],
-      birthYear: int.parse(parts[3]),
-      country: parts[4],
+      id: int.parse(lines[0]),
+      firstName: lines[1],
+      lastName: lines[2],
+      birthYear: int.parse(lines[3]),
+      country: lines[4],
     );
   }
 }

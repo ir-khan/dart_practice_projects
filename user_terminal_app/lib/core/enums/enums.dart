@@ -36,8 +36,7 @@ enum ValidUserArguments with ParseableEnum {
 enum StorageType with ParseableEnum {
   line,
   json,
-  binary,
-  all;
+  binary;
 
   @override
   String get rawValue => name;

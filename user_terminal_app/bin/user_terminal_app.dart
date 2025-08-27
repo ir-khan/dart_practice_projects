@@ -8,7 +8,7 @@ import 'package:user_terminal_app/user/repositories/user_database_repository.dar
 import 'package:user_terminal_app/user/repositories/user_file_repository.dart';
 import 'package:user_terminal_app/user/repositories/user_repository.dart';
 import 'package:user_terminal_app/user/repositories/user_server_repository.dart';
-import 'package:user_terminal_app/user/services/user_file_service.dart';
+import 'package:user_terminal_app/user/services/user_storage.dart';
 
 // final chopper = ChopperClient(
 //   baseUrl: Uri.parse("http://localhost:3000"),
@@ -45,10 +45,19 @@ void main(List<String> arguments) async {
 
     switch (repoSource) {
       case RepositorySource.file:
-        userRepository = UserFileRepository(
-          await UserFileService.init(),
-          storage: encoding,
-        );
+        late final UserStorage storage;
+        switch (encoding) {
+          case StorageType.line:
+            storage = LineUserStorage();
+            break;
+          case StorageType.json:
+            storage = JsonUserStorage();
+            break;
+          case StorageType.binary:
+            storage = BinaryUserStorage();
+            break;
+        }
+        userRepository = UserFileRepository(storage);
         break;
       case RepositorySource.server:
         userRepository = UserServerRepository(
