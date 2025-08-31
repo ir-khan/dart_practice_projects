@@ -1,18 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:user_terminal_app/user/models/user.dart';
+import 'package:user_terminal_app/features/user/data/models/user.dart';
+import 'package:user_terminal_app/features/user/data/models/user_mappers.dart';
 
-abstract class UserStorage {
+abstract class UserFileSource {
   Future<List<User>> readAll();
   Future<void> writeAll(List<User> users);
   Future<void> clear();
 }
 
-class LineUserStorage implements UserStorage {
-  final File _file = File('users.txt');
+class LineUserFileSource implements UserFileSource {
+  final File _file = File('storage/users.txt');
 
-  LineUserStorage() {
+  LineUserFileSource() {
     if (!_file.existsSync()) {
       _file.createSync();
     }
@@ -41,10 +42,10 @@ class LineUserStorage implements UserStorage {
   }
 }
 
-class JsonUserStorage implements UserStorage {
-  final File _file = File('users.json');
+class JsonUserFileSource implements UserFileSource {
+  final File _file = File('storage/users.json');
 
-  JsonUserStorage() {
+  JsonUserFileSource() {
     if (!_file.existsSync()) {
       _file.createSync();
       _file.writeAsStringSync('[]');
@@ -72,10 +73,10 @@ class JsonUserStorage implements UserStorage {
   }
 }
 
-class BinaryUserStorage implements UserStorage {
-  final File _file = File('users.bin');
+class BinaryUserFileSource implements UserFileSource {
+  final File _file = File('storage/users.bin');
 
-  BinaryUserStorage() {
+  BinaryUserFileSource() {
     if (!_file.existsSync()) {
       _file.createSync();
     }

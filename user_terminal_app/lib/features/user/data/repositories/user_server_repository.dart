@@ -1,5 +1,5 @@
-import 'package:user_terminal_app/user/models/user.dart';
-import 'package:user_terminal_app/user/repositories/user_repository.dart';
+import 'package:user_terminal_app/features/user/data/models/user.dart';
+import 'package:user_terminal_app/features/user/data/repositories/user_repository.dart';
 
 class UserServerRepository implements UserRepository {
   // final UserApiService _userApi;

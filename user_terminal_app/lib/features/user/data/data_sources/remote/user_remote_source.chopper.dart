@@ -1,7 +1,7 @@
 // dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'user_api_service.dart';
+part of 'user_remote_source.dart';
 
 // **************************************************************************
 // ChopperGenerator
@@ -9,14 +9,14 @@ part of 'user_api_service.dart';
 
 // coverage:ignore-file
 // ignore_for_file: type=lint
-final class _$UserApiService extends UserApiService {
-  _$UserApiService([ChopperClient? client]) {
+final class _$UserRemoteSource extends UserRemoteSource {
+  _$UserRemoteSource([ChopperClient? client]) {
     if (client == null) return;
     this.client = client;
   }
 
   @override
-  final Type definitionType = UserApiService;
+  final Type definitionType = UserRemoteSource;
 
   @override
   Future<Response<dynamic>> createUser({required Map<String, dynamic> body}) {

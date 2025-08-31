@@ -1,4 +1,4 @@
-import 'package:user_terminal_app/user/models/user.dart';
+import 'package:user_terminal_app/features/user/data/models/user.dart';
 
 abstract interface class UserRepository {
   Future<void> createUser({

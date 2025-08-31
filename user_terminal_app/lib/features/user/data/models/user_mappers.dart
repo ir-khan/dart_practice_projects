@@ -1,22 +1,17 @@
 import 'dart:io';
 
-import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:user_terminal_app/core/databases/local_database.dart';
 import 'package:user_terminal_app/core/exceptions/exceptions.dart';
+import 'package:user_terminal_app/features/user/data/models/user.dart';
 
-part 'user.freezed.dart';
-part 'user.g.dart';
-
-@freezed
-abstract class User with _$User {
-  const factory User({
-    required int id,
-    required String firstName,
-    required String lastName,
-    required int birthYear,
-    required String country,
-  }) = _User;
-
-  factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
+extension UserDataMapper on UserTableData {
+  User toUserModel() => User(
+    id: id,
+    firstName: firstName,
+    lastName: lastName,
+    birthYear: birthYear,
+    country: country,
+  );
 }
 
 extension UserRaw on User {

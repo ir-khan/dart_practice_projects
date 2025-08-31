@@ -1,11 +1,11 @@
 import 'package:chopper/chopper.dart';
 
-part "user_api_service.chopper.dart";
+part "user_remote_source.chopper.dart";
 
 @ChopperApi(baseUrl: "/users")
-abstract class UserApiService extends ChopperService {
-  static UserApiService create([ChopperClient? client]) =>
-      _$UserApiService(client);
+abstract class UserRemoteSource extends ChopperService {
+  static UserRemoteSource create([ChopperClient? client]) =>
+      _$UserRemoteSource(client);
 
   @POST()
   Future<Response> createUser({@Body() required  Map<String, dynamic> body});

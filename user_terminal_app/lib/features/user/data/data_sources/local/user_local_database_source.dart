@@ -1,14 +1,13 @@
 import 'package:drift/drift.dart';
 import 'package:user_terminal_app/core/databases/local_database.dart';
-import 'package:user_terminal_app/user/mappers/user_mapper.dart';
-import 'package:user_terminal_app/user/models/user.dart';
-import 'package:user_terminal_app/user/repositories/user_repository.dart';
+import 'package:user_terminal_app/features/user/data/models/user.dart';
+import 'package:user_terminal_app/features/user/data/models/user_mappers.dart';
 
-class UserDatabaseRepository implements UserRepository {
-  final AppDatabase database;
+class UserLocalDatabaseSource {
+  final AppDatabase _database;
 
-  UserDatabaseRepository(this.database);
-  @override
+  UserLocalDatabaseSource(this._database);
+
   Future<void> createUser({
     required String firstName,
     required String lastName,
@@ -22,47 +21,43 @@ class UserDatabaseRepository implements UserRepository {
         birthYear: birthYear,
         country: country,
       );
-      await database.into(database.userTable).insert(newUser);
+      await _database.into(_database.userTable).insert(newUser);
     } catch (e) {
       rethrow;
     }
   }
 
-  @override
   Future<void> deleteAllUser() async {
     try {
-      await database.delete(database.userTable).go();
+      await _database.delete(_database.userTable).go();
     } catch (e) {
       rethrow;
     }
   }
 
-  @override
   Future<void> deleteUser({required int id}) async {
     try {
-      await (database.delete(
-        database.userTable,
+      await (_database.delete(
+        _database.userTable,
       )..where((u) => u.id.equals(id))).go();
     } catch (e) {
       rethrow;
     }
   }
 
-  @override
   Future<List<User>> getAllUser() async {
     try {
-      final users = await database.select(database.userTable).get();
+      final users = await _database.select(_database.userTable).get();
       return users.map((user) => user.toUserModel()).toList();
     } catch (e) {
       rethrow;
     }
   }
 
-  @override
   Future<User> getUsertById({required int id}) async {
     try {
-      final user = await (database.select(
-        database.userTable,
+      final user = await (_database.select(
+        _database.userTable,
       )..where((u) => u.id.equals(id))).getSingle();
       return user.toUserModel();
     } catch (e) {
@@ -70,7 +65,6 @@ class UserDatabaseRepository implements UserRepository {
     }
   }
 
-  @override
   Future<bool> updateUser({
     required int id,
     String? firstName,
@@ -80,8 +74,8 @@ class UserDatabaseRepository implements UserRepository {
   }) async {
     try {
       final updatedRows =
-          await (database.update(
-            database.userTable,
+          await (_database.update(
+            _database.userTable,
           )..where((u) => u.id.equals(id))).write(
             UserTableCompanion(
               firstName: firstName != null ? Value(firstName) : Value.absent(),

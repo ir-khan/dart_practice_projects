@@ -1,14 +1,14 @@
 import 'dart:io';
 
 import 'package:user_terminal_app/core/exceptions/exceptions.dart';
-import 'package:user_terminal_app/user/models/user.dart';
-import 'package:user_terminal_app/user/repositories/user_repository.dart';
-import 'package:user_terminal_app/user/services/user_storage.dart';
+import 'package:user_terminal_app/features/user/data/models/user.dart';
+import 'package:user_terminal_app/features/user/data/repositories/user_repository.dart';
+import 'package:user_terminal_app/features/user/data/data_sources/local/user_file_source.dart';
 
 class UserFileRepository implements UserRepository {
-  final UserStorage _userStorage;
+  final UserFileSource _userFileSource;
 
-  const UserFileRepository(this._userStorage);
+  const UserFileRepository(this._userFileSource);
 
   @override
   Future<void> createUser({
@@ -18,7 +18,7 @@ class UserFileRepository implements UserRepository {
     required String country,
   }) async {
     try {
-      final users = await _userStorage.readAll();
+      final users = await _userFileSource.readAll();
       final id = users.isEmpty ? 1 : users.last.id + 1;
 
       final newUser = User(
@@ -30,7 +30,7 @@ class UserFileRepository implements UserRepository {
       );
 
       users.add(newUser);
-      await _userStorage.writeAll(users);
+      await _userFileSource.writeAll(users);
     } on FileSystemException {
       throw FileException('Unable to create user.');
     }
@@ -38,12 +38,12 @@ class UserFileRepository implements UserRepository {
 
   @override
   Future<void> deleteAllUser() async {
-    await _userStorage.clear();
+    await _userFileSource.clear();
   }
 
   @override
   Future<void> deleteUser({required int id}) async {
-    final users = await _userStorage.readAll();
+    final users = await _userFileSource.readAll();
     final initialLength = users.length;
 
     users.removeWhere((u) => u.id == id);
@@ -52,12 +52,12 @@ class UserFileRepository implements UserRepository {
       throw NotFoundException('User with id $id not found.');
     }
 
-    await _userStorage.writeAll(users);
+    await _userFileSource.writeAll(users);
   }
 
   @override
   Future<User> getUsertById({required int id}) async {
-    final users = await _userStorage.readAll();
+    final users = await _userFileSource.readAll();
     return users.firstWhere(
       (u) => u.id == id,
       orElse: () => throw NotFoundException('User with id $id not found.'),
@@ -66,7 +66,7 @@ class UserFileRepository implements UserRepository {
 
   @override
   Future<List<User>> getAllUser() async {
-    return await _userStorage.readAll();
+    return await _userFileSource.readAll();
   }
 
   @override
@@ -77,7 +77,7 @@ class UserFileRepository implements UserRepository {
     int? birthYear,
     String? country,
   }) async {
-    final users = await _userStorage.readAll();
+    final users = await _userFileSource.readAll();
     final index = users.indexWhere((u) => u.id == id);
 
     if (index == -1) {
@@ -93,7 +93,7 @@ class UserFileRepository implements UserRepository {
     );
 
     users[index] = updatedUser;
-    await _userStorage.writeAll(users);
+    await _userFileSource.writeAll(users);
     return true;
   }
 }
